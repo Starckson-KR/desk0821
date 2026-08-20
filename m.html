@@ -309,6 +309,14 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 /* 검색 결과 스트립 */
 #hres:empty{display:none}
 #hres{display:grid;gap:8px;margin-bottom:12px}
+.hcount{font-size:13px;font-weight:700;color:var(--mut);padding:2px 4px}
+.hcount b{color:var(--navy);font-size:15px}
+.moreres{background:#fff;border:1.5px dashed #C6D4CB;border-radius:11px;padding:12px;
+ font-size:14px;font-weight:800;color:var(--blue);font-family:inherit;cursor:pointer;
+ transition:var(--tr);-webkit-tap-highlight-color:transparent}
+.moreres:hover{background:var(--gl);border-color:var(--blue)}
+.moreres:active{transform:scale(.99)}
+.pmore{background:rgba(255,255,255,.3)!important;color:#fff}
 .hrs{background:#fff;border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:12px;
  padding:11px 15px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--sh1);
  animation:popIn .28s cubic-bezier(.4,0,.2,1) backwards}
@@ -576,14 +584,6 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 /* 데스크톱에서만 단축키 안내 노출 */
 .kbdonly{display:none} @media(hover:hover) and (pointer:fine){.kbdonly{display:inline}}
 .bv{font-size:11px;color:#B8C3BC;letter-spacing:.3px}
-</style>
-<style>
-.mgo{display:none!important}
-@media(max-width:900px){.mgo{display:flex;align-items:center;gap:10px;background:linear-gradient(120deg,#00602B,#009040);
- color:#fff;border-radius:13px;padding:13px 16px;margin:0 0 12px;text-decoration:none;box-shadow:var(--sh2);
- font-size:14.5px;font-weight:700;line-height:1.45}
- .mgo b{display:block;font-size:16px;margin-bottom:2px}
- .mgo span{margin-left:auto;font-size:20px;flex-shrink:0}}
 </style></head><body><div class="wrap">
 <div id="jswarn">
 <div class="jw1">⚠️ 이 화면이 보이면 <u>미리보기 모드</u>로 열린 것입니다</div>
@@ -631,7 +631,6 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
   <div class="stat">발표·토론진<b id="stp">0</b>회의실 8개실 · 세션 15개</div>
 </div>
 
-<a class="mgo" href="./m.html"><span style="margin:0;font-size:22px">📱</span><span style="margin:0;flex:1"><b>폰으로 보고 계신가요?</b>모바일 전용 화면이 따로 있습니다 — 눌러서 이동</span><span>›</span></a>
 <div id="alert"></div>
 <div class="tip" id="tip"></div>
 
@@ -791,7 +790,7 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 </div>
 
 <div class="ftr">
-  <span class="bv">빌드 v0820-1055 · 모바일</span><br>본 명단은 <b>행사 브로슈어 세부프로그램</b> 기준입니다 — 일반 참관자·사전등록자는 포함되어 있지 않으니 사무국 참석자 명부와 함께 사용하세요.<br>
+  <span class="bv">빌드 v0820-1123 · 모바일</span><br>본 명단은 <b>행사 브로슈어 세부프로그램</b> 기준입니다 — 일반 참관자·사전등록자는 포함되어 있지 않으니 사무국 참석자 명부와 함께 사용하세요.<br>
   <span class="kbdonly">단축키 <kbd>ESC</kbd> 검색 초기화 · <kbd>1</kbd>~<kbd>8</kbd> 탭 이동 · 아무 글자나 입력하면 검색창으로 이동</span>
 </div>
 </div>
@@ -877,13 +876,14 @@ function search(){
   let hits=DATA.people.filter(p=> isCho(raw) ? normCho(p._c).includes(cq) : p._all.includes(q));
   hits.sort((a,b)=>{
     const r=x=>x.name===raw?0:x.name.startsWith(raw)?1:x.name.includes(raw)?2:x.aff.includes(raw)?3:4;
-    return r(a)-r(b)||a.name.localeCompare(b.name,"ko");
+    // 정확히 찾은 사람이 먼저 → 그 다음 교수·연구진 가나다순 → 학부생 가나다순
+    return r(a)-r(b)||(a.stu?1:0)-(b.stu?1:0)||a.name.localeCompare(b.name,"ko");
   });
   if(!hits.length){ $("res").innerHTML=`<div class="none"><b>"${raw}" — 명단에 없습니다</b>
     브로슈어 세부프로그램에 없는 분입니다. 일반 참관자·사전등록자일 수 있으니 <b>사무국 참석자 명부</b>를 확인하거나<br>
     운영총괄 <b>김정우 010-5458-5144</b>에게 문의하세요.</div>`; return; }
   $("res").innerHTML=(hits.length>1?`<div style="font-size:13px;color:#6B7684;padding:0 4px 2px">${hits.length}명 검색됨 — 소속으로 구분하세요</div>`:"")
-    +hits.slice(0,40).map((p,i)=>card(p,hits.length===1||i===0)).join("");
+    +hits.slice(0,80).map((p,i)=>card(p,hits.length===1||i===0)).join("");
 }
 
 /* ── 회의실 ── */
@@ -1030,12 +1030,14 @@ function homeSearch(){
   bld.classList.add("searching");
   const q=raw.toLowerCase(), cq=normCho(raw);
   let hits=DATA.people.filter(p=> isCho(raw) ? normCho(p._c).includes(cq) : p._all.includes(q));
-  hits.sort((a,b)=>{const r=x=>x.name===raw?0:x.name.startsWith(raw)?1:2;return r(a)-r(b)||a.name.localeCompare(b.name,"ko");});
+  hits.sort((a,b)=>{const r=x=>x.name===raw?0:x.name.startsWith(raw)?1:2;
+    return r(a)-r(b)||(a.stu?1:0)-(b.stu?1:0)||a.name.localeCompare(b.name,"ko");});
   if(!hits.length){
     $("hres").innerHTML=`<div class="hrs none2">"${raw}" — 명단에 없습니다. 사무국 참석자 명부를 확인하거나 운영총괄에게 문의하세요.</div>`;
     return;
   }
-  hits=hits.slice(0,6);
+  const TOTAL=hits.length;
+  const CAP=(window._hsCap||8);
   // 지금 시각 기준으로 "볼 회의"를 정한다
   const ph2=curPhase(now());
   const target=(()=>{
@@ -1061,7 +1063,7 @@ function homeSearch(){
     const mx=Math.max(...p.slots.map(x=>RI[x.round]));
     return p.slots.filter(x=>RI[x.round]===mx);      // 이미 지났으면 마지막 세션
   };
-  // 방별로 표시할 라벨 모으기 (현재 회의만)
+  // 약도 하이라이트는 잘라내지 않고 전원 기준 (검색된 사람이 있는 방은 모두 켠다)
   const marks={};
   hits.forEach(p=>pick(p).forEach(sl=>{
     (marks[sl.room]=marks[sl.room]||[]).push(`${p.name}<u>${sl.role}</u><em class="bg2">${BADGE}</em>`);
@@ -1072,20 +1074,27 @@ function homeSearch(){
     el.classList.add("hit");
     const fl=el.closest(".flr"); if(fl) fl.classList.add("fhit");
     const d=document.createElement("div"); d.className="hitlab";
-    d.innerHTML=[...new Set(labs)].map((x,i)=>`<span style="animation-delay:${i*.05}s">📍 ${x}</span>`).join("");
+    const uniq=[...new Set(labs)];
+    d.innerHTML=uniq.slice(0,3).map((x,i)=>`<span style="animation-delay:${i*.05}s">📍 ${x}</span>`).join("")
+      +(uniq.length>3?`<span class="pmore">외 ${uniq.length-3}명</span>`:"");
     el.appendChild(d);
   });
   // 확장 명단 안의 해당 이름을 핀포인트
   const names=new Set(hits.map(p=>p.name));
+  const shown=hits.slice(0,CAP);
   document.querySelectorAll(".rt2 .dn").forEach(el=>{
     if(names.has(el.dataset.n)) el.classList.add("nfound");
   });
-  $("hres").innerHTML=hits.map((p,i)=>{
+  $("hres").innerHTML=(TOTAL>1?`<div class="hcount">${raw} <b>${TOTAL}명</b>${TOTAL>CAP?` · ${CAP}명 표시 중`:""}</div>`:"")
+   +shown.map((p,i)=>{
     const on=new Set(pick(p).map(x=>x.key));
     const locs=p.slots.map(sl=>`<span class="loc ${on.has(sl.key)?BCLS:""}" style="--c:${RC[sl.room]}"><i>${sl.round}</i>${FLOOR_OF(sl.room)}층 <b>${sl.room}호</b><s class="rr2">${sl.role}</s>${on.has(sl.key)?`<u>${BADGE}</u>`:""}</span>`);
     return `<div class="hrs" style="animation-delay:${i*.05}s">
       <span class="hn2">${p.name}</span><span class="ha">${p.aff}${p.stu?" · 학부생":""}</span>
-      <span class="hw">${[...new Set(locs)].join("")}</span></div>`;}).join("");
+      <span class="hw">${[...new Set(locs)].join("")}</span></div>`;}).join("")
+   +(TOTAL>CAP?`<button class="moreres" id="moreres">+${TOTAL-CAP}명 더보기</button>`:"");
+  const mr=document.getElementById("moreres");
+  if(mr) mr.onclick=()=>{ window._hsCap=999; homeSearch(); };
 }
 
 
