@@ -165,6 +165,7 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 .card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:18px 20px;margin-bottom:13px;box-shadow:var(--sh1);transition:box-shadow var(--tr)}
 .card:hover{box-shadow:var(--sh2)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+#p7 .two{align-items:start}
 .steps{counter-reset:s;list-style:none}
 .quote{background:#F6FAF8;border-left:4px solid var(--blue);padding:11px 15px;border-radius:0 9px 9px 0;font-size:15px;margin:7px 0;line-height:1.55}
 .danger{background:#FDF3F2;border:1px solid #E6B0AA;color:#7B241C;border-radius:13px;padding:14px 18px;font-size:14.5px;line-height:1.65;box-shadow:var(--sh1)}
@@ -588,7 +589,6 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
  .role{font-size:13px;padding:10px 13px}}
 /* 데스크톱에서만 단축키 안내 노출 */
 .kbdonly{display:none} @media(hover:hover) and (pointer:fine){.kbdonly{display:inline}}
-.bv{font-size:11px;color:#B8C3BC;letter-spacing:.3px}
 </style></head><body><div class="wrap">
 <div id="jswarn">
 <div class="jw1">⚠️ 이 화면이 보이면 <u>미리보기 모드</u>로 열린 것입니다</div>
@@ -780,7 +780,6 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
       <div style="font-size:12.5px;color:#6B7684;margin-top:12px;line-height:1.7">
         ※ 화장실·식사장소 문의가 많습니다. 도착하면 <b>층별 화장실 위치</b>와 <b>커피·다과 위치</b>를 미리 확인해두세요.
       </div>
-      <div class="tscroll" style="margin-top:10px"><table><tbody id="acc"></tbody></table></div>
     </div>
   </div>
   <div class="card"><h3>행사 개요</h3>
@@ -795,8 +794,9 @@ kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-
 </div>
 
 <div class="ftr">
-  <span class="bv">빌드 v0820-1136 · 데스크톱</span><br>본 명단은 <b>행사 브로슈어 세부프로그램</b> 기준입니다 — 일반 참관자·사전등록자는 포함되어 있지 않으니 사무국 참석자 명부와 함께 사용하세요.<br>
-  <span class="kbdonly">단축키 <kbd>ESC</kbd> 검색 초기화 · <kbd>1</kbd>~<kbd>8</kbd> 탭 이동 · 아무 글자나 입력하면 검색창으로 이동</span>
+  본 명단은 <b>행사 브로슈어 세부프로그램</b> 기준입니다 — 일반 참관자·사전등록자는 포함되어 있지 않으니 사무국 참석자 명부와 함께 사용하세요.<br>
+  <span class="kbdonly">단축키 <kbd>ESC</kbd> 검색 초기화 · <kbd>1</kbd>~<kbd>8</kbd> 탭 이동 · 아무 글자나 입력하면 검색창으로 이동</span><br>
+  <span style="opacity:.5;font-size:11px;letter-spacing:.3px">빌드 v0820-2100</span>
 </div>
 </div>
 
@@ -827,7 +827,7 @@ const PHASES=[
 
 /* ── 시간 ── */
 let OFFSET=0;
-const now=()=>new Date(Date.now()+OFFSET);
+const now=()=>{const d=new Date(Date.now()+(Number(OFFSET)||0));return isNaN(d.getTime())?new Date():d;};
 const pad=n=>String(n).padStart(2,"0");
 const hhmm=d=>pad(d.getHours())+":"+pad(d.getMinutes());
 const mins=ms=>Math.round(ms/60000);
@@ -841,12 +841,13 @@ function curPhase(t){
 const CHO=["ㄱ","ㄱ","ㄴ","ㄷ","ㄷ","ㄹ","ㅁ","ㅂ","ㅂ","ㅅ","ㅅ","ㅇ","ㅈ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
 const JN={"ㄲ":"ㄱ","ㄸ":"ㄷ","ㅃ":"ㅂ","ㅆ":"ㅅ","ㅉ":"ㅈ"};
 const chos=s=>[...s].map(c=>{const i=c.charCodeAt(0)-0xAC00;return(i>=0&&i<11172)?CHO[Math.floor(i/588)]:c;}).join("");
-const isCho=s=>s.length>0&&[...s].every(c=>c>="ㄱ"&&c<="ㅎ");
+const isCho=s=>{const t=s.replace(/\s+/g,"");return t.length>0&&[...t].every(c=>c>="ㄱ"&&c<="ㅎ");};
 const normCho=s=>[...s].map(c=>JN[c]||c).join("");
-DATA.people.forEach(p=>{p._c=chos(p.name);p._all=(p.name+" "+p.aff+" "+p.slots.map(s=>s.host+" "+s.title+" "+s.topic).join(" ")).toLowerCase();});
+DATA.people.forEach(p=>{p._c=chos(p.name);p._cn=normCho(p._c).replace(/\s+/g,"");p._all=(p.name+" "+p.aff+" "+p.slots.map(s=>s.host+" "+s.title+" "+s.topic).join(" ")).toLowerCase();});
 
 /* ── 검색 ── */
 const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function rbox(label,room,role){
   if(!room) return `<div class="rb" style="background:#E3E8EF;color:#98A2B0"><div class="l">${label}</div><div class="v">·</div></div>`;
   return `<div class="rb" style="background:${RC[room]||"#888"}"><div class="l">${label}</div><div class="v">${room}</div></div>`;
@@ -877,14 +878,14 @@ function search(){
   if(!raw){ $("res").innerHTML=`<div class="none"><b>이름을 입력하세요</b>
     이름 · 초성(ㄱㄷㅇ) · 소속(전남대) · 주제 키워드 모두 검색됩니다<br>
     등록된 발표·토론진 <b style="display:inline;font-size:16px">${DATA.people.length}명</b></div>`; return; }
-  const q=raw.toLowerCase(), cq=normCho(raw);
-  let hits=DATA.people.filter(p=> isCho(raw) ? normCho(p._c).includes(cq) : p._all.includes(q));
+  const q=raw.toLowerCase(), cq=normCho(raw).replace(/\s+/g,"");
+  let hits=DATA.people.filter(p=> isCho(raw) ? p._cn.includes(cq) : p._all.includes(q));
   hits.sort((a,b)=>{
     const r=x=>x.name===raw?0:x.name.startsWith(raw)?1:x.name.includes(raw)?2:x.aff.includes(raw)?3:4;
     // 정확히 찾은 사람이 먼저 → 그 다음 교수·연구진 가나다순 → 학부생 가나다순
     return r(a)-r(b)||(a.stu?1:0)-(b.stu?1:0)||a.name.localeCompare(b.name,"ko");
   });
-  if(!hits.length){ $("res").innerHTML=`<div class="none"><b>"${raw}" — 명단에 없습니다</b>
+  if(!hits.length){ $("res").innerHTML=`<div class="none"><b>"${esc(raw)}" — 명단에 없습니다</b>
     브로슈어 세부프로그램에 없는 분입니다. 일반 참관자·사전등록자일 수 있으니 <b>사무국 참석자 명부</b>를 확인하거나<br>
     운영총괄 <b>김정우 010-5458-5144</b>에게 문의하세요.</div>`; return; }
   $("res").innerHTML=(hits.length>1?`<div style="font-size:13px;color:#6B7684;padding:0 4px 2px">${hits.length}명 검색됨 — 소속으로 구분하세요</div>`:"")
@@ -1016,7 +1017,7 @@ function statics(){
   $("ctb").innerHTML=DATA.contacts.filter(c=>c[3]).map(c=>`<tr><td><b>${c[0]}</b></td>
     <td style="color:${c[2].includes("운영총괄")?"#C0392B;font-weight:700":"#6B7684"}">${c[2]}</td>
     <td><a href="tel:${c[3].replace(/-/g,"")}" class="tel" style="text-decoration:none">${c[3]}</a></td></tr>`).join("")
-    +`<tr><td colspan="2" style="color:#6B7684">학회 문의 메일</td><td><b style="font-size:12.5px">kag@kgovernance.com</b></td></tr>`;
+    +`<tr><td colspan="2" style="color:#6B7684;white-space:nowrap">학회 메일</td><td><b style="font-size:12.5px">kag@kgovernance.com</b></td></tr>`;
 }
 
 
@@ -1033,12 +1034,12 @@ function homeSearch(){
   $("hqc").classList.toggle("on",!!raw);
   if(!raw){ bld.classList.remove("searching"); $("hres").innerHTML=""; return; }
   bld.classList.add("searching");
-  const q=raw.toLowerCase(), cq=normCho(raw);
-  let hits=DATA.people.filter(p=> isCho(raw) ? normCho(p._c).includes(cq) : p._all.includes(q));
+  const q=raw.toLowerCase(), cq=normCho(raw).replace(/\s+/g,"");
+  let hits=DATA.people.filter(p=> isCho(raw) ? p._cn.includes(cq) : p._all.includes(q));
   hits.sort((a,b)=>{const r=x=>x.name===raw?0:x.name.startsWith(raw)?1:2;
     return r(a)-r(b)||(a.stu?1:0)-(b.stu?1:0)||a.name.localeCompare(b.name,"ko");});
   if(!hits.length){
-    $("hres").innerHTML=`<div class="hrs none2">"${raw}" — 명단에 없습니다. 사무국 참석자 명부를 확인하거나 운영총괄에게 문의하세요.</div>`;
+    $("hres").innerHTML=`<div class="hrs none2">"${esc(raw)}" — 명단에 없습니다. 사무국 참석자 명부를 확인하거나 운영총괄에게 문의하세요.</div>`;
     return;
   }
   const TOTAL=hits.length;
@@ -1090,7 +1091,7 @@ function homeSearch(){
   document.querySelectorAll(".rt2 .dn").forEach(el=>{
     if(names.has(el.dataset.n)) el.classList.add("nfound");
   });
-  $("hres").innerHTML=(TOTAL>1?`<div class="hcount">${raw} <b>${TOTAL}명</b>${TOTAL>CAP?` · ${CAP}명 표시 중`:""}</div>`:"")
+  $("hres").innerHTML=(TOTAL>1?`<div class="hcount">${esc(raw)} <b>${TOTAL}명</b>${TOTAL>CAP?` · ${CAP}명 표시 중`:""}</div>`:"")
    +shown.map((p,i)=>{
     const on=new Set(pick(p).map(x=>x.key));
     const locs=p.slots.map(sl=>`<span class="loc ${on.has(sl.key)?BCLS:""}" style="--c:${RC[sl.room]}"><i>${sl.round}</i>${FLOOR_OF(sl.room)}층 <b>${sl.room}호</b><s class="rr2">${sl.role}</s>${on.has(sl.key)?`<u>${BADGE}</u>`:""}</span>`);
@@ -1335,7 +1336,7 @@ function opsRender(){
   $("ph").innerHTML=`<div class="cl2">`+OPS.photo.items.map(x=>`<div class="it"><b>${x}</b></div>`).join("")+`</div>`;
   $("cl").innerHTML=phases(OPS.clean.phases,"c",t);
   /* 오시는 길 */
-  $("acc").innerHTML=OPS.access.map(([a,b,c])=>`<tr><td style="width:88px"><b>${a}</b></td><td>${b}<br><small style="color:#6B7684">${c}</small></td></tr>`).join("");
+  if($("acc")) $("acc").innerHTML=OPS.access.map(([a,b,c])=>`<tr><td style="width:88px"><b>${a}</b></td><td>${b}<br><small style="color:#6B7684">${c}</small></td></tr>`).join("");
   bindCk();
 }
 
@@ -1354,7 +1355,7 @@ if($("hq")){
     if(e.key==="Enter"){ e.preventDefault(); $("hq").blur(); }  /* 홈에서는 탭 이동 없음 */
     if(e.key==="Escape"){ $("hq").value=""; homeSearch(); }
   });
-  $("hqc").onclick=()=>{$("hq").value="";homeSearch();$("hq").focus();};
+  $("hqc").onclick=()=>{$("hq").value="";homeSearch();$("hq").dispatchEvent(new Event("input",{bubbles:true}));$("hq").focus();};
 }
 
 /* ── 기기 판별 ── */
@@ -1416,7 +1417,7 @@ ctl.innerHTML=`<h3>⏱ 미리보기 <em>오늘 미리 화면을 확인할 때만
 $("p3").appendChild(ctl);
 $("scrub").oninput=e=>{
   const m=+e.target.value, tgt=D(pad(Math.floor(m/60))+":"+pad(m%60));
-  OFFSET=tgt-new Date(); $("scrubv").textContent="미리보기 "+hhmm(tgt); tick();rooms();timetable();refreshPhase();
+  OFFSET=(tgt-new Date())||0; $("scrubv").textContent="미리보기 "+hhmm(tgt); tick();rooms();timetable();refreshPhase();
 };
 $("scrubr").onclick=()=>{OFFSET=0;$("scrub").value=600;$("scrubv").textContent="실제 시각";tick();rooms();timetable();refreshPhase();};
 
