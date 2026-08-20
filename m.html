@@ -1471,6 +1471,21 @@ if(!TOUCH) $("q").focus();
  .flr{grid-template-columns:44px 1fr;gap:8px;padding:10px 0}
  .fno b{font-size:20px} .fno span{font-size:10px}
  .rooms{grid-template-columns:repeat(2,1fr);gap:7px}
+ /* 홈 약도에서는 펼치지 않음 — 폭이 부족해서 회의실 탭으로 보냄 */
+ #p0 .rt2 .rdet{display:none!important}
+ #p0 .rt2 .exp{transform:none!important;font-size:20px;color:#B9C4BD}
+ #p0 .rt2:active{transform:scale(.97);background:var(--gl)}
+ .rt2.open{grid-column:1/-1}
+ .rt2.open .rdet{margin-top:12px}
+ .rt2.open .dsec{padding-top:11px;margin-top:10px}
+ .rt2.open .dsec>b{font-size:12px}
+ .rt2.open .dh{font-size:14px;margin-top:5px}
+ .rt2.open .dt{font-size:14.5px;margin:2px 0 10px;padding-bottom:9px;line-height:1.45}
+ .rt2.open .dl{grid-template-columns:48px 1fr;gap:10px;margin-bottom:9px}
+ .rt2.open .dl i{font-size:11px;padding:4px 0}
+ .rt2.open .dl span{font-size:15px;line-height:1.6}
+ .rt2.open .dtp{font-size:13px;line-height:1.6;margin-top:5px;padding-left:10px}
+ .rt2.open .dn{padding:2px 4px}
  .rt2{padding:9px 10px;border-radius:11px}
  .rt2 .rn{font-size:20px} .rt2 .rn small{font-size:10.5px}
  .rt2 .rq{font-size:12.5px;margin-top:3px} .rt2 .rw{font-size:11.5px}
@@ -1487,6 +1502,44 @@ if(!TOUCH) $("q").focus();
  .phh::after{content:"＋";position:absolute;right:14px;top:50%;transform:translateY(-50%);
   font-size:16px;font-weight:800;color:var(--mut);transition:transform var(--tr)}
  .phc.open .phh::after,.phc.act .phh::after{transform:translateY(-50%) rotate(45deg)}
+ /* ── 표는 폰에서 카드형 2열 정렬로 (가로 스크롤 없이 오와열 유지) ── */
+ .tscroll{overflow:visible}
+ .tscroll table{min-width:0!important;width:100%;display:block}
+ .tscroll thead{display:none}
+ .tscroll tbody{display:block}
+ .tscroll tr{display:grid;gap:3px 11px;align-items:baseline;
+  padding:12px 2px;border-bottom:1px solid #EFF4F1}
+ .tscroll tr:last-child{border-bottom:none}
+ .tscroll td{display:block;padding:0;border:none;background:none!important}
+ /* 전체 프로그램: 시간 | 구분 / 내용 / 장소 */
+ #pgb tr{grid-template-columns:108px 1fr}
+ #pgb td:nth-child(1){grid-area:1/1;font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap}
+ #pgb td:nth-child(2){grid-area:1/2;font-size:16px;font-weight:800;letter-spacing:-.3px}
+ #pgb td:nth-child(3){grid-area:2/2;font-size:14px;color:#39443D;line-height:1.55}
+ #pgb td:nth-child(4){grid-area:3/2;font-size:13px;color:var(--mut);font-weight:700;line-height:1.5}
+ #pgb tr.now{background:#FFF9E6;border-radius:10px;padding:12px 10px}
+ /* 진행 타임테이블: 시간 | 내용 / 장소 / 상태 */
+ #tlb tr{grid-template-columns:108px 1fr}
+ #tlb td:nth-child(1){grid-area:1/1;font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap}
+ #tlb td:nth-child(2){grid-area:1/2;font-size:16px;font-weight:800;letter-spacing:-.3px}
+ #tlb td:nth-child(3){grid-area:2/2;font-size:13px;color:var(--mut);font-weight:700}
+ #tlb td:nth-child(4){grid-area:3/2;font-size:13.5px;font-weight:800;color:var(--warn)}
+ #tlb tr.now{background:#FFF9E6;border-radius:10px;padding:12px 10px}
+ #tlb tr.done{opacity:.5}
+ /* 1·2회의 세션표: 호실칩 | 세션 / 인원 */
+ #t1 tr,#t2 tr{grid-template-columns:56px 1fr}
+ #t1 td:nth-child(1),#t2 td:nth-child(1){grid-area:1/1;grid-row:span 2}
+ #t1 td:nth-child(2),#t2 td:nth-child(2){grid-area:1/2;font-size:14.5px;line-height:1.5}
+ #t1 td:nth-child(3),#t2 td:nth-child(3){grid-area:2/2;font-size:13px;color:var(--mut);font-weight:700}
+ #t1 td:nth-child(3)::before,#t2 td:nth-child(3)::before{content:"참여 "}
+ #t1 td:nth-child(3)::after,#t2 td:nth-child(3)::after{content:"명"}
+ /* 연락처·오시는 길 */
+ #ctb tr{grid-template-columns:76px 1fr}
+ #ctb td:nth-child(1){grid-area:1/1;font-size:15px}
+ #ctb td:nth-child(2){grid-area:1/2;font-size:13.5px;color:var(--mut);font-weight:700}
+ #ctb td:nth-child(3){grid-area:2/2;font-size:16px}
+ #acc tr{grid-template-columns:76px 1fr}
+ #acc td:nth-child(1){grid-area:1/1} #acc td:nth-child(2){grid-area:1/2;line-height:1.6}
  .cnote{font-size:11.5px;padding:10px 14px;line-height:1.55}
  /* 안내 배너 — 제목만 굵게, 본문은 읽기 편하게 */
  .role{font-size:13.5px;line-height:1.75;padding:13px 15px;font-weight:500}
@@ -1508,6 +1561,13 @@ if(!TOUCH) $("q").focus();
  .verlink{display:block;text-align:center;margin:16px 10px 0;padding:12px;
   background:#fff;border:1px solid var(--line);border-radius:12px;font-size:13.5px;
   font-weight:700;color:var(--navy);text-decoration:none;box-shadow:var(--sh1)}
+}
+/* 좁은 폰(320~380px): 약도 1열로 — 2열이면 방 이름이 잘려서 줄바꿈됨 */
+@media(max-width:380px){
+ .rooms{grid-template-columns:1fr!important}
+ .hrow{grid-template-columns:1fr}
+ .qtiles{grid-template-columns:1fr}
+ .nms{grid-template-columns:repeat(2,1fr)}
 }
 @media(min-width:901px){#mbar,.verlink{display:none}}
 </style>
@@ -1567,6 +1627,38 @@ if(!TOUCH) $("q").focus();
   window.rooms=function(){ _rooms.apply(this,arguments); accRooms(); clampNames(); };
   accRooms(); clampNames();
 
+  /* 표에서 값이 "—"인 칸은 숨김 (빈 줄이 자리만 차지) */
+  function hideDash(){
+    document.querySelectorAll("#pgb td,#tlb td,#t1 td,#t2 td").forEach(td=>{
+      const t=(td.textContent||"").trim();
+      td.style.display=(t==="—"||t==="-"||t==="")?"none":"";
+    });
+  }
+  const _tt=window.timetable;
+  window.timetable=function(){ _tt.apply(this,arguments); hideDash(); };
+  const _op3=window.opsRender;
+  window.opsRender=function(){ _op3.apply(this,arguments); hideDash(); };
+  setTimeout(hideDash,80);
+  const sb=document.getElementById("scrubr"); if(sb) sb.textContent="실제 시각으로";
+
+  /* 홈 약도 타일 탭 → 회의실 탭에서 해당 방 펼치기 (전체 폭 사용) */
+  document.addEventListener("click",ev=>{
+    const el=ev.target.closest("#p0 .rt2[data-room]");
+    if(!el) return;
+    ev.stopPropagation(); ev.preventDefault();
+    const room=el.dataset.room;
+    document.querySelectorAll(".tab")[2].click();
+    setTimeout(()=>{
+      const card=[...document.querySelectorAll("#p2 .rcard")].find(c=>{
+        const t=c.querySelector(".rhd b"); return t&&t.textContent.replace(/\D/g,"")===room;});
+      if(!card) return;
+      document.querySelectorAll("#p2 .rcard.open").forEach(x=>{x.classList.remove("open");});
+      OPEN.clear(); OPEN.add("별관 "+room);
+      card.classList.add("open");
+      card.scrollIntoView({block:"start",behavior:"smooth"});
+    },140);
+  },true);
+
   /* 명단이 길면 6명만 보이고 나머지는 "더보기" */
   function clampNames(){
     document.querySelectorAll("#p2 .nms").forEach(g=>{
@@ -1594,6 +1686,14 @@ if(!TOUCH) $("q").focus();
   const _ops=window.opsRender;
   window.opsRender=function(){ _ops.apply(this,arguments); accPhase(); };
   accPhase();
+
+  /* 홈 타일 아이콘을 이동 화살표로 */
+  function homeArrow(){
+    document.querySelectorAll("#p0 .rt2 .exp").forEach(x=>{if(x.textContent!=="›")x.textContent="›";});
+  }
+  const _home=window.home;
+  window.home=function(){ _home.apply(this,arguments); homeArrow(); };
+  homeArrow();
 
   /* 배너 제목의 괄호 부분은 작게 분리 */
   function trimRole(){
