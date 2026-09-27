@@ -1,0 +1,20 @@
+{
+  "enabledPlugins": {
+    "humanize-korean@im-not-ai": true,
+    "kordoc@kordoc": true
+  },
+  "extraKnownMarketplaces": {
+    "im-not-ai": {
+      "source": {
+        "source": "github",
+        "repo": "epoko77-ai/im-not-ai"
+      }
+    },
+    "kordoc": {
+      "source": {
+        "source": "github",
+        "repo": "chrisryugj/kordoc"
+      }
+    }
+  }
+}
